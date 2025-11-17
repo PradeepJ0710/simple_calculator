@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:simple/core/cubit/update_cubit.dart';
+import 'package:simple/core/services/update_service.dart';
+import 'package:simple/presentation/screens/update_screen.dart';
 
 import 'core/bloc/calculator_bloc.dart';
 import 'core/cubit/theme_cubit.dart';
@@ -29,27 +32,32 @@ class CalculatorApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ThemeCubit(),
+          create: (_) => ThemeCubit(),
         ),
         BlocProvider(
-          create: (context) => CalculatorBloc(
+          create: (_) => CalculatorBloc(
             performCalculation: PerformCalculation(
               repository: CalculatorRepository(),
             ),
           ),
         ),
+        BlocProvider(
+          create: (_) => UpdateCubit(AppUpdateService())..checkForUpdates(),
+        ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeState>(
-        builder: (context, themeState) {
-          return MaterialApp(
-            title: 'Calculator',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeState.themeMode,
-            home: const CalculatorScreen(),
-          );
-        },
+      child: BlocBuilder<UpdateCubit, UpdateState>(
+        builder: (_, updateState) => BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (__, themeState) {
+            return MaterialApp(
+              title: 'Calculator',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeState.themeMode,
+              home: updateState.status == UpdateStatus.available ? const UpdateView() : const CalculatorScreen(),
+            );
+          },
+        ),
       ),
     );
   }

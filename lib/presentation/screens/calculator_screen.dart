@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple/core/bloc/calculator_bloc.dart';
 import 'package:simple/core/cubit/theme_cubit.dart';
+import 'package:simple/widgets/button_section.dart';
+import 'package:simple/widgets/display_section.dart';
 
-import '../../widgets/button_section.dart';
-import '../../widgets/display_section.dart';
-
-/// Main calculator screen
+/// Main calculator screen with update handling
 class CalculatorScreen extends StatelessWidget {
   const CalculatorScreen({super.key});
 
@@ -17,6 +16,7 @@ class CalculatorScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          // Theme toggle
           BlocBuilder<ThemeCubit, ThemeState>(
             builder: (context, themeState) {
               return IconButton(
@@ -38,7 +38,7 @@ class CalculatorScreen extends StatelessWidget {
             Expanded(
               flex: 35,
               child: BlocBuilder<CalculatorBloc, CalculatorState>(
-                builder: (context, state) {
+                builder: (_, state) {
                   return DisplaySection(
                     expression: state.expression,
                     displayValue: state.displayValue,

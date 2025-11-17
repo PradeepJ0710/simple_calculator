@@ -29,6 +29,17 @@ class AppTheme {
       bodyColor: Colors.black87,
       displayColor: Colors.black87,
     ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12.0),
+            ),
+          ),
+        ),
+      ),
+    ),
     colorScheme: const ColorScheme.light(
       primary: primaryLight,
       secondary: primaryLight,
@@ -45,6 +56,12 @@ class AppTheme {
     textTheme: GoogleFonts.robotoTextTheme().apply(
       bodyColor: Colors.white,
       displayColor: Colors.white,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0)))),
+        foregroundColor: WidgetStateProperty.resolveWith((state) => state.any([WidgetState.disabled].contains) ? Colors.grey : Colors.white),
+      ),
     ),
     colorScheme: const ColorScheme.dark(
       primary: primaryDark,
