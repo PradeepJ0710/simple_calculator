@@ -18,7 +18,7 @@ class UpdateCubit extends Cubit<UpdateState> {
     try {
       final AppUpdateInfo? updateInfo = await _updateService.checkForUpdate();
 
-      if (updateInfo != null) {
+      if (updateInfo != null && updateInfo.updateAvailability.value == 2) {
         emit(UpdateState.available());
         return;
       }
