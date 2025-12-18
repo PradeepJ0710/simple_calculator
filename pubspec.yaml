@@ -3,7 +3,7 @@ description: "A calculator with basic math functions, currently being used for G
 
 publish_to: 'none'
 
-version: 0.0.2+2
+version: 0.0.3+4
 
 environment:
   sdk: ^3.6.0
@@ -16,6 +16,7 @@ dependencies:
   flutter_bloc:
   google_fonts:
   in_app_update: 4.2.3
+  flutter_staggered_animations: ^1.1.1
 
 dev_dependencies:
   flutter_test:
