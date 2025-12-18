@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:simple/core/cubit/update_cubit.dart';
 import 'package:simple/core/theme/app_theme.dart';
 
 class UpdateView extends StatefulWidget {
@@ -11,14 +13,7 @@ class UpdateView extends StatefulWidget {
 
 class _UpdateViewState extends State<UpdateView> {
   Future _performUpdate() async {
-    // try {
-    //   await InAppUpdate.performImmediateUpdate();
-    // } catch (e) {
-    //   if (kDebugMode) {
-    //     debugPrint('Error caught while performing immediate update: ${e.toString()}');
-    //   }
-    //   return AppUpdateResult.inAppUpdateFailed;
-    // }
+    context.read<UpdateCubit>().startUpdate();
   }
 
   @override
