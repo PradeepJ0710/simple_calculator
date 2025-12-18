@@ -10,7 +10,7 @@ class Calculation extends Equatable {
 
   const Calculation({
     required this.displayValue,
-    required this.expression,
+    this.expression = '',
     this.result,
     this.operation,
     this.isError = false,

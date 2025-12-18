@@ -57,3 +57,20 @@ class PercentPressed extends CalculatorEvent {
 class PlusMinusPressed extends CalculatorEvent {
   const PlusMinusPressed();
 }
+
+class ToggleHistory extends CalculatorEvent {
+  const ToggleHistory();
+}
+
+class HistoryItemPressed extends CalculatorEvent {
+  final Calculation calculation;
+
+  const HistoryItemPressed(this.calculation);
+
+  @override
+  List<Object?> get props => [calculation];
+}
+
+class ClearHistory extends CalculatorEvent {
+  const ClearHistory();
+}

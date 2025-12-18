@@ -12,7 +12,8 @@ part 'calculator_state.dart';
 class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   final PerformCalculation performCalculation;
 
-  CalculatorBloc({required this.performCalculation}) : super(CalculatorState.initial()) {
+  CalculatorBloc({required this.performCalculation})
+      : super(CalculatorState.initial()) {
     on<NumberPressed>(_onNumberPressed);
     on<OperationPressed>(_onOperationPressed);
     on<EqualsPressed>(_onEqualsPressed);
@@ -21,6 +22,9 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     on<DecimalPressed>(_onDecimalPressed);
     on<PercentPressed>(_onPercentPressed);
     on<PlusMinusPressed>(_onPlusMinusPressed);
+    on<ToggleHistory>(_onToggleHistory);
+    on<HistoryItemPressed>(_onHistoryItemPressed);
+    on<ClearHistory>(_onClearHistoryPressed);
   }
 
   void _onNumberPressed(NumberPressed event, Emitter<CalculatorState> emit) {
@@ -43,7 +47,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     ));
   }
 
-  void _onOperationPressed(OperationPressed event, Emitter<CalculatorState> emit) {
+  void _onOperationPressed(
+      OperationPressed event, Emitter<CalculatorState> emit) {
     if (state.isError) {
       emit(CalculatorState.initial());
       return;
@@ -53,7 +58,9 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     if (currentValue == null) return;
 
     // If there's already an operation and operands, calculate first
-    if (state.firstOperand != null && state.operation != null && !state.shouldResetDisplay) {
+    if (state.firstOperand != null &&
+        state.operation != null &&
+        !state.shouldResetDisplay) {
       try {
         final result = performCalculation(
           firstOperand: state.firstOperand!,
@@ -63,12 +70,26 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
         if (result != null) {
           final formattedResult = performCalculation.formatNumber(result);
+
+          final calculation = Calculation(
+            displayValue: state.displayValue,
+            expression: state.expression,
+            result: result,
+            operation: event.operation,
+          );
+
+          final updatedHistory = [calculation, ...state.history];
+          if (updatedHistory.length > 10) {
+            updatedHistory.removeLast();
+          }
+
           emit(state.copyWith(
             displayValue: formattedResult,
             expression: '$formattedResult ${event.operation}',
             firstOperand: result,
             operation: event.operation,
             shouldResetDisplay: true,
+            history: updatedHistory,
           ));
         }
       } catch (e) {
@@ -109,18 +130,32 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
 
       if (result != null) {
         final formattedResult = performCalculation.formatNumber(result);
+
+        final calculation = state.toCalculation().copyWith(
+              result: result,
+              expression: '${state.expression} ${state.displayValue} =',
+            );
+
+        final updatedHistory = [calculation, ...state.history];
+        if (updatedHistory.length > 10) {
+          updatedHistory.removeLast();
+        }
+
         emit(state.copyWith(
           displayValue: formattedResult,
           expression: '${state.expression} ${state.displayValue} =',
           secondOperand: result,
           shouldResetDisplay: true,
           clearOperands: true,
+          history: updatedHistory,
         ));
       }
     } catch (e) {
       emit(state.copyWith(
         displayValue: AppConstants.errorMessage,
-        expression: e.toString().contains('zero') ? AppConstants.divideByZeroError : AppConstants.errorMessage,
+        expression: e.toString().contains('zero')
+            ? AppConstants.divideByZeroError
+            : AppConstants.errorMessage,
         isError: true,
         clearOperands: true,
       ));
@@ -128,7 +163,7 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
   }
 
   void _onClearPressed(ClearPressed event, Emitter<CalculatorState> emit) {
-    emit(CalculatorState.initial());
+    emit(CalculatorState.initial().copyWith(history: state.history));
   }
 
   void _onDeletePressed(DeletePressed event, Emitter<CalculatorState> emit) {
@@ -141,7 +176,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
       emit(state.copyWith(displayValue: '0'));
     } else {
       emit(state.copyWith(
-        displayValue: state.displayValue.substring(0, state.displayValue.length - 1),
+        displayValue:
+            state.displayValue.substring(0, state.displayValue.length - 1),
       ));
     }
   }
@@ -185,7 +221,8 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     ));
   }
 
-  void _onPlusMinusPressed(PlusMinusPressed event, Emitter<CalculatorState> emit) {
+  void _onPlusMinusPressed(
+      PlusMinusPressed event, Emitter<CalculatorState> emit) {
     if (state.isError) {
       emit(CalculatorState.initial());
       return;
@@ -198,5 +235,29 @@ class CalculatorBloc extends Bloc<CalculatorEvent, CalculatorState> {
     final formattedValue = performCalculation.formatNumber(newValue);
 
     emit(state.copyWith(displayValue: formattedValue));
+  }
+
+  void _onToggleHistory(ToggleHistory event, Emitter<CalculatorState> emit) {
+    emit(state.copyWith(isHistoryVisible: !state.isHistoryVisible));
+  }
+
+  void _onHistoryItemPressed(
+      HistoryItemPressed event, Emitter<CalculatorState> emit) {
+    if (event.calculation.result == null) return;
+
+    final formattedResult =
+        performCalculation.formatNumber(event.calculation.result!);
+
+    // When a history item is pressed, we populate the display with its result
+    emit(state.copyWith(
+      displayValue: formattedResult,
+      shouldResetDisplay:
+          true, // Allow user to start typing a new number immediately
+    ));
+  }
+
+  void _onClearHistoryPressed(
+      ClearHistory event, Emitter<CalculatorState> emit) {
+    emit(state.copyWith(history: [], isHistoryVisible: false));
   }
 }

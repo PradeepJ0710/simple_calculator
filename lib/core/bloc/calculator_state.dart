@@ -18,7 +18,12 @@ class CalculatorState extends Equatable {
     this.operation,
     this.shouldResetDisplay = false,
     this.isError = false,
+    this.history = const [],
+    this.isHistoryVisible = false,
   });
+
+  final List<Calculation> history;
+  final bool isHistoryVisible;
 
   factory CalculatorState.initial() {
     return const CalculatorState(
@@ -29,6 +34,8 @@ class CalculatorState extends Equatable {
       operation: null,
       shouldResetDisplay: false,
       isError: false,
+      history: [],
+      isHistoryVisible: false,
     );
   }
 
@@ -41,15 +48,20 @@ class CalculatorState extends Equatable {
     bool? shouldResetDisplay,
     bool? isError,
     bool clearOperands = false,
+    List<Calculation>? history,
+    bool? isHistoryVisible,
   }) {
     return CalculatorState(
       displayValue: displayValue ?? this.displayValue,
       expression: expression ?? this.expression,
       firstOperand: clearOperands ? null : (firstOperand ?? this.firstOperand),
-      secondOperand: clearOperands ? null : (secondOperand ?? this.secondOperand),
+      secondOperand:
+          clearOperands ? null : (secondOperand ?? this.secondOperand),
       operation: operation ?? this.operation,
       shouldResetDisplay: shouldResetDisplay ?? this.shouldResetDisplay,
       isError: isError ?? this.isError,
+      history: history ?? this.history,
+      isHistoryVisible: isHistoryVisible ?? this.isHistoryVisible,
     );
   }
 
@@ -72,5 +84,7 @@ class CalculatorState extends Equatable {
         operation,
         shouldResetDisplay,
         isError,
+        history,
+        isHistoryVisible,
       ];
 }
