@@ -3,7 +3,7 @@ description: "A calculator with basic math functions, currently being used for G
 
 publish_to: 'none'
 
-version: 0.0.3+4
+version: 1.0.0+5
 
 environment:
   sdk: ^3.6.0
